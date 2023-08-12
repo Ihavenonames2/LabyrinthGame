@@ -70,16 +70,27 @@ struct Map
 {
     int countOfBombs = 0;
     int countOfAidKits = 0;
-    int sizeX = 0;
-    int sizeY = 0;
-    char** map = new char* [5];
+    const int sizeX = 30;
+    const int sizeY = 15;
+    char** map = new char* [sizeY];
     Map()
     {
-        map[0] = new char[11] {"##########"};
-        map[1] = new char[11] {"#        #"};
-        map[2] = new char[11] {"# ### ##9#"};
-        map[3] = new char[11] {"#  9    8#"};
-        map[4] = new char[11] {"#######D##"};
+        
+        map[0] = new char[30] {"############################"};
+        map[1] = new char[30] {"#          #   #     #   # #"};
+        map[2] = new char[30] {"#  ##  ##   #   #   #   #  #"};
+        map[3] = new char[30] {"##    #  #           #     #"};
+        map[4] = new char[30] {"##    #  #     #    #    # #"};
+        map[5] = new char[30] {"##     #          #     #  #"};
+        map[6] = new char[30] {"#  #       #     #  #    # #"};
+        map[7] = new char[30] {"#   # #  #    #      #   ###"};
+        map[8] = new char[30] {"#  #       #     #  ##     #"};
+        map[9] = new char[30] {"#     #  #   #          #  #"};
+        map[10] = new char[30] {"#  #      #      #       # #"};
+        map[11] = new char[30] {"#   #   #    # #    #      #"};
+        map[12] = new char[30] {"#  #    ###    #       #   #"};
+        map[13] = new char[30] {"#    #    #      #         #"};
+        map[14] = new char[30] {"#########################D##"};
     }
 };
 
@@ -110,8 +121,6 @@ void SetColor(Color text, Color background)
 
 void initMap(Map& map, GameSettings settings)
 {
-    map.sizeX = settings.MapSizeX;
-    map.sizeY = settings.MapSizeY;
     map.countOfBombs = settings.BombsCount;
     map.countOfAidKits = settings.AidCount;
 }
@@ -190,7 +199,7 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
     }
     else if (cell == mappedObjects.finish)
     {
-        setCursorPosition(0, 6);
+        setCursorPosition(0, map.sizeY + 1);
 
         std::cout << "CONGRATS, U WON, RETURNING TO MENU..." << std::endl;
         Sleep(3000);
@@ -216,9 +225,9 @@ void game(Player &player, Map &map)
 {
 
     
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < map.sizeY; ++i)
     {
-        for (int j = 0; j < 10; ++j)
+        for (int j = 0; j < map.sizeX; ++j)
             if (map.map[i][j] == '9')
             {
                 SetColor(Black, Black);
@@ -256,11 +265,11 @@ void game(Player &player, Map &map)
         TryToMove(control.right, map.map[player.y][player.x + 1], drill, input, map, player);
         TryToMove(control.left, map.map[player.y][player.x - 1], drill, input, map, player);
 
-        setCursorPosition(0, 5);
+        setCursorPosition(0, map.sizeY);
         std::cout << "                                                                                                             ";
-        setCursorPosition(0, 6);
+        setCursorPosition(0, map.sizeY + 1);
         std::cout << "                                                                                                             ";
-        setCursorPosition(0, 5);
+        setCursorPosition(0, map.sizeY);
         std::cout << "HP:" << player.hp << " AID KITS:" << player.inventory.countOfAidKits << " DRILLS:" << player.inventory.countOfDrills << std::endl;
         std::cout << "BOMBS ON MAP: " << map.countOfBombs << " AID KITS ON MAP: " << map.countOfAidKits << std::endl;
         std::cout << "Time in game = " << static_cast<double>(clock()) / CLOCKS_PER_SEC << std::endl;
