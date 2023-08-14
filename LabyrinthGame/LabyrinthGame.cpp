@@ -145,6 +145,26 @@ void DrawHUD(const Player &player, const Map &map)
     std::cout << "BOMBS ON MAP: " << map.countOfBombs << " AID KITS ON MAP: " << map.countOfAidKits << std::endl;
 }
 
+void DrawMap(Map& map)
+{
+    for (int i = 0; i < map.sizeY; ++i)
+    {
+        for (int j = 0; j < map.sizeX; ++j)
+            if (map.map[i][j] == '9')
+            {
+                SetColor(Black, Black);
+                std::cout << map.map[i][j];
+                SetColor(White, Black);
+            }
+            else
+            {
+                std::cout << map.map[i][j];
+            }
+
+        std::cout << std::endl;
+    }
+}
+
 void UseAid(Player& player)
 {
     if (player.inventory.countOfAidKits == 0)
@@ -224,23 +244,7 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
 void game(Player &player, Map &map)
 {
 
-    
-    for (int i = 0; i < map.sizeY; ++i)
-    {
-        for (int j = 0; j < map.sizeX; ++j)
-            if (map.map[i][j] == '9')
-            {
-                SetColor(Black, Black);
-                std::cout << map.map[i][j];
-                SetColor(White, Black);
-            }
-            else
-            {
-                std::cout << map.map[i][j];
-            }
-                
-        std::cout << std::endl;
-    }
+    DrawMap(map);
     DrawHUD(player, map);
 
     player.x = 1;
@@ -266,8 +270,7 @@ void game(Player &player, Map &map)
         TryToMove(control.left, map.map[player.y][player.x - 1], drill, input, map, player);
 
         setCursorPosition(0, map.sizeY);
-        std::cout << "                                                                                                             ";
-        setCursorPosition(0, map.sizeY + 1);
+        std::cout << "                                                                                                             "<<std::endl;
         std::cout << "                                                                                                             ";
         setCursorPosition(0, map.sizeY);
         std::cout << "HP:" << player.hp << " AID KITS:" << player.inventory.countOfAidKits << " DRILLS:" << player.inventory.countOfDrills << std::endl;
@@ -320,7 +323,7 @@ int main()
             break;
 
         }
-
+        //delete ne zabud
     }
 
     return 0;
