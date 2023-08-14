@@ -45,7 +45,6 @@ const struct BombSettings
 
 struct GameState
 {
-    bool isWin = false;
     bool shouldExit = false;
 }gameState;
 
@@ -57,6 +56,7 @@ struct GameSettings
     int AidCount = 0;
     int PlayerHP = 0;
     int DrillsCount = 0;
+    int BackgroundColor = 0;
 };
 
 struct Player
@@ -87,17 +87,17 @@ struct Map
         map[0] = new char[30] {"############################"};
         map[1] = new char[30] {"#          #   #     #   # #"};
         map[2] = new char[30] {"#  ##  ##   #   #   #   #  #"};
-        map[3] = new char[30] {"##    #  #           #     #"};
-        map[4] = new char[30] {"##    #  #     #    #    # #"};
-        map[5] = new char[30] {"##     #          #     #  #"};
-        map[6] = new char[30] {"#  #       #     #  #    # #"};
+        map[3] = new char[30] {"##    #  #  #        #  #  #"};
+        map[4] = new char[30] {"##    #  #  #  #    ##   # #"};
+        map[5] = new char[30] {"##     # #  #     #     #  #"};
+        map[6] = new char[30] {"#  #     ###     #  #    # #"};
         map[7] = new char[30] {"#   # #  #    #      #   ###"};
         map[8] = new char[30] {"#  #       #     #  ##     #"};
-        map[9] = new char[30] {"#     #  #   #          #  #"};
-        map[10] = new char[30] {"#  #      #      #       # #"};
-        map[11] = new char[30] {"#   #   #    # #    #      #"};
-        map[12] = new char[30] {"#  #    ###    #       #   #"};
-        map[13] = new char[30] {"#    #    #      #         #"};
+        map[9] = new char[30] {"#     #  # # #       #  #  #"};
+        map[10] = new char[30] {"#  #  #   #      #  #    # #"};
+        map[11] = new char[30] {"#   # # #    # # #  #  #  ##"};
+        map[12] = new char[30] {"#  #  # ###    #    #     ##"};
+        map[13] = new char[30] {"#    ##   #      #     #   #"};
         map[14] = new char[30] {"#########################D##"};
     }
     ~Map()
@@ -152,10 +152,7 @@ void initMap(Map& map, GameSettings settings)
     map.countOfAidKits = settings.AidCount;
     GenerateObject(map, map.countOfBombs, mappedObjects.bomb);
     GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
-
-    
 }
-
 
 
 void initPlayer(Player& player, GameSettings &settings, Map& map)
@@ -167,7 +164,7 @@ void initPlayer(Player& player, GameSettings &settings, Map& map)
         player.x = rand() % (map.sizeX - 1) + 1;
         player.y = rand() % (map.sizeY - 1) + 1;
 
-        if (map.map[player.y][player.x] == ' ')
+        if (map.map[player.y][player.x] == mappedObjects.air)
             break;
     }
        
@@ -192,11 +189,11 @@ void DrawMap(Map& map)
     for (int i = 0; i < map.sizeY; ++i)
     {
         for (int j = 0; j < map.sizeX; ++j)
-            if (map.map[i][j] == '9')
+            if (map.map[i][j] == mappedObjects.bomb)
             {
-                //SetColor(Black, Black);
+                SetColor(Black, Black);
                 std::cout << map.map[i][j];
-                //SetColor(White, Black);
+                SetColor(White, Black);
             }
             else
             {
@@ -242,7 +239,7 @@ void TryToUseDrill(char input, Player& player, bool& drill)
 // control.down, map.map[player.y + 1][player.x], drill 
 void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Player& player)
 {
-    if (input != control || cell == mappedObjects.wall)
+    if (input != control || (cell == mappedObjects.wall && drill == false))
     {
         return;
     }
@@ -264,11 +261,13 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
         setCursorPosition(0, map.sizeY + 1);
 
         std::cout << "CONGRATS, U WON, RETURNING TO MENU..." << std::endl;
+        gameState.shouldExit=true;
         Sleep(3000);
         return;
     }
     else if (cell == mappedObjects.wall)
     {
+        if(cell)
         cell = mappedObjects.air;
         drill = false;
     }
@@ -282,14 +281,11 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
     if (control == ::control.left)
         --player.x;
 }
-
 void game(Player &player, Map &map)
 {
 
     DrawMap(map);
     DrawHUD(player, map);
-
-    
 
     setCursorPosition(player.x, player.y);
     std::cout << player.drawableChar;
@@ -314,14 +310,13 @@ void game(Player &player, Map &map)
         std::cout << "                                                                                                             "<<std::endl;
         std::cout << "                                                                                                             ";
         setCursorPosition(0, map.sizeY);
-        std::cout << "HP:" << player.hp << " AID KITS:" << player.inventory.countOfAidKits << " DRILLS:" << player.inventory.countOfDrills << std::endl;
-        std::cout << "BOMBS ON MAP: " << map.countOfBombs << " AID KITS ON MAP: " << map.countOfAidKits << std::endl;
+        DrawHUD(player, map);
         std::cout << "Time in game = " << static_cast<double>(clock()) / CLOCKS_PER_SEC << std::endl;
         if (player.hp <= 0)
         {
             std::cout << "YOU LOSE, RETURNING TO MENU..." << std::endl;
             Sleep(3000);
-            gameState.isWin = false;
+            system("cls");
             gameState.shouldExit = true;
         }
 
@@ -336,13 +331,14 @@ int main()
     srand(time(0));
     Player player;
     GameSettings settings;
-    Map map;
+    
 
     int menu = -1;
 
     while (menu != 0)
     {
-
+        Map map;
+        gameState.shouldExit = false;
         std::cout << "Welcome to labyrinth game, choose difficulty level" << std::endl;
         std::cout << "1 for easy" << std::endl;
         std::cout << "2 for medium" << std::endl;
@@ -361,8 +357,30 @@ int main()
             initMap(map, settings);
             system("cls");
             game(player, map);
+            system("cls");
             break;
-
+        case 2:
+            settings.AidCount = 20;
+            settings.BombsCount = 20;
+            settings.PlayerHP = 100;
+            settings.DrillsCount = 1;
+            initPlayer(player, settings, map);
+            initMap(map, settings);
+            system("cls");
+            game(player, map);
+            system("cls");
+            break;
+        case 3:
+            settings.AidCount = 10;
+            settings.BombsCount = 20;
+            settings.PlayerHP = 100;
+            settings.DrillsCount = 0;
+            initPlayer(player, settings, map);
+            initMap(map, settings);
+            system("cls");
+            game(player, map);
+            system("cls");
+            break;
         }
       
     }
