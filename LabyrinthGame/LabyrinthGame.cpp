@@ -22,6 +22,14 @@ enum Color
     Yellow = 14,
     White = 15
 };
+const struct MappedObjects
+{
+    char bomb = '9';
+    char aidkit = '8';
+    char wall = '#';
+    char finish = 'D';
+    char air = ' ';
+} mappedObjects;
 
 const struct AidKitSettings
 {
@@ -92,16 +100,59 @@ struct Map
         map[13] = new char[30] {"#    #    #      #         #"};
         map[14] = new char[30] {"#########################D##"};
     }
+    void GenerateBombs(Map& map)
+    {
+        int flag = 0;
+        int i = 0;
+        while (flag < map.countOfBombs)
+        {
+            for (int j = 0; j < map.sizeX; ++j)
+                if (map.map[i][j] == mappedObjects.air)
+                {
+                    if (rand() % 10 == 1)
+                    {
+                        map.map[i][j] = mappedObjects.bomb;
+                        flag++;
+                    }
+                    if (flag > map.countOfBombs)
+                    {
+                        break;
+                    }
+                }
+            i++;
+        }
+    }
+    void GenerateAidKits(Map& map)
+    {
+        int flag = 0;
+        int i = 0;
+        while (flag < map.countOfBombs)
+        {
+            for (int j = 0; j < map.sizeX; ++j)
+                if (map.map[i][j] == mappedObjects.air)
+                {
+                    if (rand() % 10 == 1)
+                    {
+                        map.map[i][j] = mappedObjects.aidkit;
+                        flag++;
+                    }
+                    if (flag > map.countOfAidKits)
+                    {
+                        break;
+                    }
+                }
+            i++;
+        }
+    }
+    ~Map()
+    {
+        for (int i = 0; i < sizeY; i++)
+            delete[]map[i];
+        delete[]map;
+    }
 };
 
-const struct MappedObjects
-{
-    char bomb = '9';
-    char aidkit = '8';
-    char wall = '#';
-    char finish = 'D';
-    char air = ' ';
-} mappedObjects;
+
 
 const struct Control
 {
@@ -123,12 +174,17 @@ void initMap(Map& map, GameSettings settings)
 {
     map.countOfBombs = settings.BombsCount;
     map.countOfAidKits = settings.AidCount;
+    map.GenerateBombs(map);
+    map.GenerateAidKits(map);
+    
 }
+
+
 
 void initPlayer(Player& player, GameSettings &settings)
 {
     player.hp = settings.PlayerHP;
-    player.inventory.countOfDrills = settings.BombsCount;
+    player.inventory.countOfDrills = settings.DrillsCount;
 }
 
 void setCursorPosition(int x, int y) {
@@ -152,9 +208,9 @@ void DrawMap(Map& map)
         for (int j = 0; j < map.sizeX; ++j)
             if (map.map[i][j] == '9')
             {
-                SetColor(Black, Black);
+                //SetColor(Black, Black);
                 std::cout << map.map[i][j];
-                SetColor(White, Black);
+                //SetColor(White, Black);
             }
             else
             {
@@ -197,7 +253,7 @@ void TryToUseDrill(char input, Player& player, bool& drill)
     }
 }
 
-// control.down, map.map[player.y + 1][player.x], drill
+// control.down, map.map[player.y + 1][player.x], drill 
 void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Player& player)
 {
     if (input != control || cell == mappedObjects.wall)
@@ -312,8 +368,8 @@ int main()
         switch (menu)
         {
         case 1:
-            settings.AidCount = 1;
-            settings.BombsCount = 2;
+            settings.AidCount = 20;
+            settings.BombsCount = 10;
             settings.PlayerHP = 100;
             settings.DrillsCount = 2;
             initPlayer(player, settings);
@@ -323,7 +379,7 @@ int main()
             break;
 
         }
-        //delete ne zabud
+      
     }
 
     return 0;
