@@ -100,50 +100,6 @@ struct Map
         map[13] = new char[30] {"#    #    #      #         #"};
         map[14] = new char[30] {"#########################D##"};
     }
-    void GenerateBombs(Map& map)
-    {
-        int flag = 0;
-        int i = 0;
-        while (flag < map.countOfBombs)
-        {
-            for (int j = 0; j < map.sizeX; ++j)
-                if (map.map[i][j] == mappedObjects.air)
-                {
-                    if (rand() % 10 == 1)
-                    {
-                        map.map[i][j] = mappedObjects.bomb;
-                        flag++;
-                    }
-                    if (flag > map.countOfBombs)
-                    {
-                        break;
-                    }
-                }
-            i++;
-        }
-    }
-    void GenerateAidKits(Map& map)
-    {
-        int flag = 0;
-        int i = 0;
-        while (flag < map.countOfBombs)
-        {
-            for (int j = 0; j < map.sizeX; ++j)
-                if (map.map[i][j] == mappedObjects.air)
-                {
-                    if (rand() % 10 == 1)
-                    {
-                        map.map[i][j] = mappedObjects.aidkit;
-                        flag++;
-                    }
-                    if (flag > map.countOfAidKits)
-                    {
-                        break;
-                    }
-                }
-            i++;
-        }
-    }
     ~Map()
     {
         for (int i = 0; i < sizeY; i++)
@@ -152,7 +108,27 @@ struct Map
     }
 };
 
+void GenerateObject(Map& map, int amount, char object)
+{
+    int x = 0;
+    int y = 0;
+    int flag = 0;
+    while (1)
+    {
+        x = rand() % (map.sizeX - 1) + 1;
+        y = rand() % (map.sizeY - 1) + 1;
+        if (map.map[y][x] == mappedObjects.air)
+        {
+            map.map[y][x] = object;
+            flag++;
+        }
+        if (flag >= amount)
+        {
+            break;
+        }
 
+    }
+}
 
 const struct Control
 {
@@ -174,18 +150,28 @@ void initMap(Map& map, GameSettings settings)
 {
     map.countOfBombs = settings.BombsCount;
     map.countOfAidKits = settings.AidCount;
-    map.GenerateBombs(map);
-    map.GenerateAidKits(map);
+    GenerateObject(map, map.countOfBombs, mappedObjects.bomb);
+    GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
+
     
 }
 
 
 
-void initPlayer(Player& player, GameSettings &settings)
+void initPlayer(Player& player, GameSettings &settings, Map& map)
 {
     player.hp = settings.PlayerHP;
     player.inventory.countOfDrills = settings.DrillsCount;
-}
+    while (1)
+    {
+        player.x = rand() % (map.sizeX - 1) + 1;
+        player.y = rand() % (map.sizeY - 1) + 1;
+
+        if (map.map[player.y][player.x] == ' ')
+            break;
+    }
+       
+}   
 
 void setCursorPosition(int x, int y) {
     COORD pos;
@@ -303,8 +289,7 @@ void game(Player &player, Map &map)
     DrawMap(map);
     DrawHUD(player, map);
 
-    player.x = 1;
-    player.y = 1;
+    
 
     setCursorPosition(player.x, player.y);
     std::cout << player.drawableChar;
@@ -372,7 +357,7 @@ int main()
             settings.BombsCount = 10;
             settings.PlayerHP = 100;
             settings.DrillsCount = 2;
-            initPlayer(player, settings);
+            initPlayer(player, settings, map);
             initMap(map, settings);
             system("cls");
             game(player, map);
@@ -385,4 +370,5 @@ int main()
     return 0;
 
 }
+
 
