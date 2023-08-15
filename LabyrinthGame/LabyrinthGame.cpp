@@ -113,7 +113,7 @@ void GenerateObject(Map& map, int amount, char object)
     int x = 0;
     int y = 0;
     int flag = 0;
-    while (1)
+    while (flag < amount)
     {
         x = rand() % (map.sizeX - 1) + 1;
         y = rand() % (map.sizeY - 1) + 1;
@@ -122,11 +122,6 @@ void GenerateObject(Map& map, int amount, char object)
             map.map[y][x] = object;
             flag++;
         }
-        if (flag >= amount)
-        {
-            break;
-        }
-
     }
 }
 
@@ -154,20 +149,15 @@ void initMap(Map& map, GameSettings settings)
     GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
 }
 
-
 void initPlayer(Player& player, GameSettings &settings, Map& map)
 {
     player.hp = settings.PlayerHP;
     player.inventory.countOfDrills = settings.DrillsCount;
-    while (1)
+    while (map.map[player.y][player.x] != mappedObjects.air)
     {
         player.x = rand() % (map.sizeX - 1) + 1;
         player.y = rand() % (map.sizeY - 1) + 1;
-
-        if (map.map[player.y][player.x] == mappedObjects.air)
-            break;
     }
-       
 }   
 
 void setCursorPosition(int x, int y) {
@@ -236,7 +226,7 @@ void TryToUseDrill(char input, Player& player, bool& drill)
     }
 }
 
-// control.down, map.map[player.y + 1][player.x], drill 
+
 void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Player& player)
 {
     if (input != control || (cell == mappedObjects.wall && drill == false))
@@ -262,12 +252,15 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
 
         std::cout << "CONGRATS, U WON, RETURNING TO MENU..." << std::endl;
         gameState.shouldExit=true;
-        Sleep(3000);
+        system("pause");
+
         return;
     }
     else if (cell == mappedObjects.wall)
     {
-        if(cell)
+        if (cell + 1 == '#')
+            return;
+
         cell = mappedObjects.air;
         drill = false;
     }
@@ -281,6 +274,7 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
     if (control == ::control.left)
         --player.x;
 }
+
 void game(Player &player, Map &map)
 {
 
