@@ -2,7 +2,8 @@
 #include <vector>
 #include <Windows.h>
 #include <conio.h>
-//test
+#include <fstream>
+
 
 enum Color
 {
@@ -253,8 +254,17 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
 
         std::cout << "CONGRATS, U WON, RETURNING TO MENU..." << std::endl;
         gameState.shouldExit=true;
+        
         system("pause");
+        std::fstream file("file.txt", std::ios::out);
+        for (int i = 0; i < map.sizeY; ++i)
+        {
+            for (int j = 0; j < map.sizeX; ++j)
+                file << map.map[i][j];
 
+            file << std::endl;
+        }
+        file.close();
         return;
     }
     else if (cell == mappedObjects.wall)
