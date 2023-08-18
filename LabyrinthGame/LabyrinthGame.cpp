@@ -135,6 +135,7 @@ const struct Control
     char left = 'a';
     char useAid = 'q';
     char useDrill = 'e';
+    char saveGame = 'h';
 } control;
 
 void SetColor(Color text, Color background)
@@ -151,6 +152,16 @@ void initMap(Map& map, GameSettings settings)
     GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
 }
 
+void pushMapTofile(Map& map)
+{
+    std::fstream file("map.txt", std::ios::out);
+    for (int i = 0; i < map.sizeY; ++i)
+    {
+        file << map.map[i];
+        file << std::endl;
+    }
+    file.close();
+}
 void initPlayer(Player& player, GameSettings &settings, Map& map)
 {
     player.hp = settings.PlayerHP;
@@ -211,6 +222,38 @@ void UseAid(Player& player)
     player.inventory.countOfAidKits--;
 }
 
+void saveSettings(GameSettings settings)
+{
+    std::fstream file1("settings.txt", std::ios::out);
+    
+    file1 << settings.AidCount << std::endl;
+    file1 << settings.BombsCount << std::endl;
+    file1 << settings.DrillsCount << std::endl;
+    file1 << settings.PlayerHP << std::endl;
+    file1 << settings.MapSizeX << std::endl;
+    file1 << settings.MapSizeY << std::endl;
+    file1 << settings.BackgroundColor << std::endl;
+    file1 << std::endl;
+    
+    file1.close();
+}
+void TryToSaveGame(char input, Map& map, Player& player, GameSettings settings)
+{
+    if (input == control.saveGame)
+    {
+        pushMapTofile(map);
+        saveSettings(settings);
+    }
+        
+    
+
+}
+
+void LoadGameFromFile()
+{
+
+}
+
 void TryToUseAid(char input, Player& player)
 {
     if (input == control.useAid)
@@ -254,17 +297,9 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
 
         std::cout << "CONGRATS, U WON, RETURNING TO MENU..." << std::endl;
         gameState.shouldExit=true;
-        
+        pushMapTofile(map);
         system("pause");
-        std::fstream file("file.txt", std::ios::out);
-        for (int i = 0; i < map.sizeY; ++i)
-        {
-            for (int j = 0; j < map.sizeX; ++j)
-                file << map.map[i][j];
-
-            file << std::endl;
-        }
-        file.close();
+        
         return;
     }
     else if (cell == mappedObjects.wall)
@@ -286,7 +321,7 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
         --player.x;
 }
 
-void game(Player &player, Map &map)
+void game(Player &player, Map &map, GameSettings settings)
 {
 
     DrawMap(map);
@@ -302,9 +337,10 @@ void game(Player &player, Map &map)
         input = _getch();
         setCursorPosition(player.x, player.y);
         std::cout << mappedObjects.air;
-
+        TryToSaveGame(input, map, player, settings);
         TryToUseAid(input, player);
         TryToUseDrill(input, player, drill);
+
 
         TryToMove(control.down, map.map[player.y + 1][player.x], drill, input, map, player);
         TryToMove(control.up, map.map[player.y - 1][player.x], drill, input, map, player);
@@ -349,6 +385,7 @@ int main()
         std::cout << "2 for medium" << std::endl;
         std::cout << "3 for hard" << std::endl;
         std::cout << "0 to close game" << std::endl;
+        std::cout << "4 to start game from save" << std::endl;
 
         std::cin >> menu;
         switch (menu)
@@ -361,7 +398,7 @@ int main()
             initPlayer(player, settings, map);
             initMap(map, settings);
             system("cls");
-            game(player, map);
+            game(player, map, settings);
             system("cls");
             break;
         case 2:
@@ -372,7 +409,7 @@ int main()
             initPlayer(player, settings, map);
             initMap(map, settings);
             system("cls");
-            game(player, map);
+            game(player, map, settings);
             system("cls");
             break;
         case 3:
@@ -383,9 +420,11 @@ int main()
             initPlayer(player, settings, map);
             initMap(map, settings);
             system("cls");
-            game(player, map);
+            game(player, map, settings);
             system("cls");
             break;
+        case 4:
+            LoadGameFromFile();
         }
       
     }

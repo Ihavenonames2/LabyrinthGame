@@ -1,8 +1,8 @@
 ﻿  LabyrinthGame.cpp
-C:\Users\admin\source\repos\LabyrinthGame\LabyrinthGame\LabyrinthGame.cpp(336,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\admin\source\repos\LabyrinthGame\LabyrinthGame\LabyrinthGame.cpp(372,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   Generating code
-  3 of 161 functions ( 1.9%) were compiled, the rest were copied from previous compilation.
+  3 of 165 functions ( 1.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  LabyrinthGame.vcxproj -> C:\Users\admin\Source\Repos\LabyrinthGame\x64\Release\LabyrinthGame.exe
+  LabyrinthGame.vcxproj -> C:\Users\admin\source\repos\LabyrinthGame\x64\Release\LabyrinthGame.exe

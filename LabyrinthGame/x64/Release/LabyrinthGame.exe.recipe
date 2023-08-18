@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\admin\Source\Repos\LabyrinthGame\x64\Release\LabyrinthGame.exe</FullPath>
+      <FullPath>C:\Users\admin\source\repos\LabyrinthGame\x64\Release\LabyrinthGame.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
