@@ -194,9 +194,9 @@ void DrawMap(Map& map)
         for (int j = 0; j < map.sizeX; ++j)
             if (map.map[i][j] == mappedObjects.bomb)
             {
-                SetColor(Black, Black);
+                //SetColor(Black, Black);
                 std::cout << map.map[i][j];
-                SetColor(White, Black);
+                //SetColor(White, Black);
             }
             else
             {
@@ -222,16 +222,17 @@ void UseAid(Player& player)
     player.inventory.countOfAidKits--;
 }
 
-void saveSettings(GameSettings settings)
+void saveSettings(GameSettings settings, Map& map, Player& player)
 {
     std::fstream file1("settings.txt", std::ios::out);
     
-    file1 << settings.AidCount << std::endl;
-    file1 << settings.BombsCount << std::endl;
-    file1 << settings.DrillsCount << std::endl;
-    file1 << settings.PlayerHP << std::endl;
-    file1 << settings.MapSizeX << std::endl;
-    file1 << settings.MapSizeY << std::endl;
+    file1 << map.countOfAidKits << std::endl;
+    file1 << map.countOfBombs << std::endl;
+    file1 << player.inventory.countOfDrills << std::endl;
+    file1 << player.inventory.countOfAidKits << std::endl;
+    file1 << player.hp << std::endl;
+    file1 << map.sizeX << std::endl;
+    file1 << map.sizeY << std::endl;
     file1 << settings.BackgroundColor << std::endl;
     file1 << std::endl;
     
@@ -242,16 +243,38 @@ void TryToSaveGame(char input, Map& map, Player& player, GameSettings settings)
     if (input == control.saveGame)
     {
         pushMapTofile(map);
-        saveSettings(settings);
+        saveSettings(settings, map, player);
     }
         
     
 
 }
 
-void LoadGameFromFile()
+void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
 {
+    std::fstream file("map.txt", std::ios::in);
+    for(int i = 0; i < map.sizeY;i++)
+    {
+        file >> map.map[i];
+        DrawMap(map);
+    }
+    file.close();
+    DrawMap(map);
 
+    std::fstream file1("settings.txt", std::ios::in);
+    file1 >> settings.AidCount;
+    file1 >> settings.BombsCount;
+    file1 >> settings.DrillsCount;
+    file1 >> player.inventory.countOfAidKits;
+    file1 >> settings.PlayerHP;
+    file1 >> settings.MapSizeX;
+    file1 >> settings.MapSizeY;
+    file1 >> settings.BackgroundColor;
+    file1.close();
+    initPlayer(player, settings, map);
+    initMap(map, settings);
+    
+    
 }
 
 void TryToUseAid(char input, Player& player)
@@ -424,7 +447,11 @@ int main()
             system("cls");
             break;
         case 4:
-            LoadGameFromFile();
+            LoadGameFromFile(map, player, settings);
+            system("pause");
+            system("cls");
+            game(player, map, settings);
+            system("cls");
         }
       
     }
