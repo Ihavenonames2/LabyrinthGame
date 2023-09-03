@@ -161,7 +161,7 @@ void initMap(Map& map, GameSettings settings)
 {
     map.countOfBombs = settings.BombsCount;
     map.countOfAidKits = settings.AidCount;
-    if (!ObjectOnMap(map))
+    if (!ObjectOnMap(map)) // if there is no objects on map(bombs and aidkits) we need to generate them
     {
         GenerateObject(map, map.countOfBombs, mappedObjects.bomb);
         GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
@@ -189,7 +189,8 @@ void initPlayer(Player& player, GameSettings &settings, Map& map)
     }
 }   
 
-void setCursorPosition(int x, int y) {
+void setCursorPosition(int x, int y) 
+{
     COORD pos;
     pos.X = x;
     pos.Y = y;
@@ -210,9 +211,9 @@ void DrawMap(Map& map)
         for (int j = 0; j < map.sizeX; ++j)
             if (map.map[i][j] == mappedObjects.bomb)
             {
-                //SetColor(Black, Black);
+                SetColor(Black, Black);
                 std::cout << map.map[i][j];
-                //SetColor(White, Black);
+                SetColor(White, Black);
             }
             else
             {
@@ -263,10 +264,12 @@ void TryToSaveGame(char input, Map& map, Player& player, GameSettings settings)
     }
 }
 
-void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
+void LoadMapFromFile(Map& map)
 {
     std::fstream file("map.txt", std::ios::in);
-    for(int i = 0; i < map.sizeY;i++)
+    if (!file.is_open())
+        std::cout << "Cant open file" << std::endl;
+    for (int i = 0; i < map.sizeY; i++)
     {
         std::string str;
         std::getline(file, str);
@@ -274,11 +277,20 @@ void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
         {
             map.map[i][j] = str[j];
         }
-            
+
     }
     file.close();
-    
+}
+
+void LoadSettingsFromFile(GameSettings& settings, Player& player)
+{
     std::fstream file1("settings.txt", std::ios::in);
+    if (!file1.is_open())
+    {
+        std::cout << "Cant open file" << std::endl;
+        system("pause");
+    }
+       
     file1 >> settings.AidCount;
     file1 >> settings.BombsCount;
     file1 >> settings.DrillsCount;
@@ -288,9 +300,11 @@ void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
     file1 >> settings.MapSizeY;
     file1 >> settings.BackgroundColor;
     file1.close();
-    
-    
-    
+}
+void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
+{
+    LoadMapFromFile(map);
+    LoadSettingsFromFile(settings, player);
 }
 
 void TryToUseAid(char input, Player& player)
