@@ -1,3 +1,3 @@
 ﻿  LabyrinthGame.cpp
-C:\Users\38095\source\repos\LabyrinthGame\LabyrinthGame\LabyrinthGame.cpp(333,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\38095\source\repos\LabyrinthGame\LabyrinthGame\LabyrinthGame.cpp(397,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   LabyrinthGame.vcxproj -> C:\Users\38095\source\repos\LabyrinthGame\x64\Debug\LabyrinthGame.exe

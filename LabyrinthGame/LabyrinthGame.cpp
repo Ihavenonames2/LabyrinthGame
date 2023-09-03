@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <conio.h>
 #include <fstream>
+#include <string>
 
 
 enum Color
@@ -127,6 +128,18 @@ void GenerateObject(Map& map, int amount, char object)
     }
 }
 
+bool ObjectOnMap(Map& map)
+{
+    for (int i = 0; i < map.sizeY; ++i)
+    {
+        for (int j = 0; j < map.sizeX; ++j)
+            if (map.map[i][j] == mappedObjects.bomb || map.map[i][j] == mappedObjects.aidkit)
+            {
+                return true;
+            }
+    }
+    return false;
+}
 const struct Control
 {
     char up = 'w';
@@ -148,8 +161,11 @@ void initMap(Map& map, GameSettings settings)
 {
     map.countOfBombs = settings.BombsCount;
     map.countOfAidKits = settings.AidCount;
-    GenerateObject(map, map.countOfBombs, mappedObjects.bomb);
-    GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
+    if (!ObjectOnMap(map))
+    {
+        GenerateObject(map, map.countOfBombs, mappedObjects.bomb);
+        GenerateObject(map, map.countOfAidKits, mappedObjects.aidkit);
+    }
 }
 
 void pushMapTofile(Map& map)
@@ -245,9 +261,6 @@ void TryToSaveGame(char input, Map& map, Player& player, GameSettings settings)
         pushMapTofile(map);
         saveSettings(settings, map, player);
     }
-        
-    
-
 }
 
 void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
@@ -255,12 +268,16 @@ void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
     std::fstream file("map.txt", std::ios::in);
     for(int i = 0; i < map.sizeY;i++)
     {
-        file >> map.map[i];
-        DrawMap(map);
+        std::string str;
+        std::getline(file, str);
+        for (int j = 0; j < str.size(); j++)
+        {
+            map.map[i][j] = str[j];
+        }
+            
     }
     file.close();
-    DrawMap(map);
-
+    
     std::fstream file1("settings.txt", std::ios::in);
     file1 >> settings.AidCount;
     file1 >> settings.BombsCount;
@@ -271,8 +288,7 @@ void LoadGameFromFile(Map& map, Player& player, GameSettings& settings)
     file1 >> settings.MapSizeY;
     file1 >> settings.BackgroundColor;
     file1.close();
-    initPlayer(player, settings, map);
-    initMap(map, settings);
+    
     
     
 }
@@ -344,7 +360,7 @@ void TryToMove(char control, char& cell, bool& drill, char input, Map& map, Play
         --player.x;
 }
 
-void game(Player &player, Map &map, GameSettings settings)
+void StartGame(Player &player, Map &map, GameSettings settings)
 {
 
     DrawMap(map);
@@ -418,42 +434,28 @@ int main()
             settings.BombsCount = 10;
             settings.PlayerHP = 100;
             settings.DrillsCount = 2;
-            initPlayer(player, settings, map);
-            initMap(map, settings);
-            system("cls");
-            game(player, map, settings);
-            system("cls");
             break;
         case 2:
             settings.AidCount = 20;
             settings.BombsCount = 20;
             settings.PlayerHP = 100;
             settings.DrillsCount = 1;
-            initPlayer(player, settings, map);
-            initMap(map, settings);
-            system("cls");
-            game(player, map, settings);
-            system("cls");
             break;
         case 3:
             settings.AidCount = 10;
             settings.BombsCount = 20;
             settings.PlayerHP = 100;
             settings.DrillsCount = 0;
-            initPlayer(player, settings, map);
-            initMap(map, settings);
-            system("cls");
-            game(player, map, settings);
-            system("cls");
             break;
         case 4:
             LoadGameFromFile(map, player, settings);
-            system("pause");
-            system("cls");
-            game(player, map, settings);
-            system("cls");
+            break;
         }
-      
+        initPlayer(player, settings, map);
+        initMap(map, settings);
+        system("cls");
+        StartGame(player, map, settings);
+        system("cls");
     }
 
     return 0;
