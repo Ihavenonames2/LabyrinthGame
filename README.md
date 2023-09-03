@@ -42,5 +42,11 @@ Marked on map as - '%'. Spawns at random place, can move in all 4 directions.
 
 # ![image](https://github.com/Ihavenonames2/LabyrinthGame/assets/115930939/5e8b0ac5-e67f-4adb-b946-9c7286f09324)
 
+#  How to install game
+- Go to releases(right tab)
+- Choose latest releas
+- Download .exe file
+- Run .exe and enjoy playing!
+
 
 
